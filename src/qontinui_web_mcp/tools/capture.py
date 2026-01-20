@@ -441,14 +441,14 @@ async def handle_capture_tool(
             if not project_id:
                 return {"success": False, "error": "Project ID is required"}
 
-            params: dict[str, Any] = {}
+            workflow_params: dict[str, Any] = {}
             if arguments.get("status"):
-                params["status"] = arguments["status"]
+                workflow_params["status"] = arguments["status"]
 
             result = await client._request(
                 "GET",
                 f"/api/v1/capture/projects/{project_id}/learned-workflows",
-                params=params,
+                params=workflow_params,
             )
 
             return {

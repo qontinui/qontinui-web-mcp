@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from qontinui_web_mcp.client import QontinuiClient
 from qontinui_web_mcp.server import (
     AUTH_TOOL_NAMES,
     AUTHENTICATED_TOOL_NAMES,
@@ -17,7 +18,7 @@ class TestServerTools:
     """Tests for server tool listing."""
 
     @pytest.mark.asyncio
-    async def test_list_tools_returns_all_tools(self):
+    async def test_list_tools_returns_all_tools(self) -> None:
         """Test that list_tools returns all registered tools."""
         tools = await list_tools()
         assert len(tools) > 0
@@ -32,7 +33,7 @@ class TestServerTools:
         assert "create_capture_session" in tool_names
 
     @pytest.mark.asyncio
-    async def test_all_tools_have_descriptions(self):
+    async def test_all_tools_have_descriptions(self) -> None:
         """Test that all tools have descriptions."""
         tools = await list_tools()
         for tool in tools:
@@ -44,7 +45,7 @@ class TestServerToolRouting:
     """Tests for tool call routing."""
 
     @pytest.mark.asyncio
-    async def test_unknown_tool_returns_error(self):
+    async def test_unknown_tool_returns_error(self) -> None:
         """Test that unknown tool returns error."""
         result = await call_tool("unknown_tool", {})
         assert len(result) == 1
@@ -54,7 +55,7 @@ class TestServerToolRouting:
         assert "error" in data
 
     @pytest.mark.asyncio
-    async def test_auth_tool_does_not_require_authentication(self):
+    async def test_auth_tool_does_not_require_authentication(self) -> None:
         """Test that auth tools don't require authentication."""
         with patch("qontinui_web_mcp.server.get_client") as mock_get_client:
             mock_client = MagicMock()
@@ -72,15 +73,17 @@ class TestAuthentication:
     """Tests for authentication handling."""
 
     @pytest.mark.asyncio
-    async def test_ensure_authenticated_with_token(self, mock_client):
+    async def test_ensure_authenticated_with_token(
+        self, mock_client: QontinuiClient
+    ) -> None:
         """Test ensure_authenticated with valid token."""
         result = await ensure_authenticated(mock_client)
         assert result is None
 
     @pytest.mark.asyncio
     async def test_ensure_authenticated_without_credentials(
-        self, unauthenticated_client
-    ):
+        self, unauthenticated_client: QontinuiClient
+    ) -> None:
         """Test ensure_authenticated without credentials."""
         # Clear any credentials
         unauthenticated_client.settings.email = None
@@ -99,8 +102,8 @@ class TestAuthentication:
 
     @pytest.mark.asyncio
     async def test_ensure_authenticated_auto_login_success(
-        self, unauthenticated_client
-    ):
+        self, unauthenticated_client: QontinuiClient
+    ) -> None:
         """Test ensure_authenticated with auto-login."""
         with patch("qontinui_web_mcp.server.get_settings") as mock_get_settings:
             mock_settings = MagicMock()
@@ -121,12 +124,12 @@ class TestAuthentication:
 class TestToolCategories:
     """Tests for tool categorization."""
 
-    def test_auth_tools_not_in_authenticated(self):
+    def test_auth_tools_not_in_authenticated(self) -> None:
         """Test auth tools are not in authenticated set."""
         for tool_name in AUTH_TOOL_NAMES:
             assert tool_name not in AUTHENTICATED_TOOL_NAMES
 
-    def test_authenticated_tools_comprehensive(self):
+    def test_authenticated_tools_comprehensive(self) -> None:
         """Test all non-auth tools require authentication."""
         # This ensures we don't accidentally add tools without auth
         expected_auth_requiring = {

@@ -1,6 +1,7 @@
 """Pytest fixtures for qontinui-web-mcp tests."""
 
 from datetime import datetime
+from typing import Generator
 from uuid import UUID
 
 import pytest
@@ -11,7 +12,7 @@ from qontinui_web_mcp.utils.config import Settings
 
 
 @pytest.fixture
-def mock_settings():
+def mock_settings() -> Settings:
     """Create mock settings."""
     return Settings(
         api_url="http://localhost:8000",
@@ -21,7 +22,7 @@ def mock_settings():
 
 
 @pytest.fixture
-def mock_user():
+def mock_user() -> User:
     """Create a mock user."""
     return User(
         id=UUID("12345678-1234-1234-1234-123456789012"),
@@ -33,7 +34,7 @@ def mock_user():
 
 
 @pytest.fixture
-def mock_project():
+def mock_project() -> Project:
     """Create a mock project."""
     return Project(
         id=UUID("abcdef12-1234-1234-1234-123456789012"),
@@ -55,7 +56,7 @@ def mock_project():
 
 
 @pytest.fixture
-def mock_tokens():
+def mock_tokens() -> AuthTokens:
     """Create mock auth tokens."""
     return AuthTokens(
         access_token="mock-access-token",
@@ -64,7 +65,9 @@ def mock_tokens():
 
 
 @pytest.fixture
-def mock_client(mock_settings, mock_user, mock_tokens):
+def mock_client(
+    mock_settings: Settings, mock_user: User, mock_tokens: AuthTokens
+) -> QontinuiClient:
     """Create a mock Qontinui client."""
     client = QontinuiClient(settings=mock_settings)
     client._access_token = mock_tokens.access_token
@@ -72,6 +75,6 @@ def mock_client(mock_settings, mock_user, mock_tokens):
 
 
 @pytest.fixture
-def unauthenticated_client(mock_settings):
+def unauthenticated_client(mock_settings: Settings) -> QontinuiClient:
     """Create an unauthenticated client."""
     return QontinuiClient(settings=mock_settings)

@@ -25,19 +25,19 @@ from qontinui_web_mcp.types import (
 class TestAuthModels:
     """Tests for authentication models."""
 
-    def test_auth_credentials(self):
+    def test_auth_credentials(self) -> None:
         """Test AuthCredentials model."""
         creds = AuthCredentials(email="test@example.com", password="password")
         assert creds.email == "test@example.com"
         assert creds.password == "password"
 
-    def test_auth_tokens(self):
+    def test_auth_tokens(self) -> None:
         """Test AuthTokens model."""
         tokens = AuthTokens(access_token="abc123")
         assert tokens.access_token == "abc123"
         assert tokens.token_type == "bearer"
 
-    def test_user_model(self):
+    def test_user_model(self) -> None:
         """Test User model."""
         user = User(
             id=UUID("12345678-1234-1234-1234-123456789012"),
@@ -51,25 +51,25 @@ class TestAuthModels:
 class TestProjectModels:
     """Tests for project models."""
 
-    def test_project_create(self):
+    def test_project_create(self) -> None:
         """Test ProjectCreate model."""
         project = ProjectCreate(name="Test Project", description="A test")
         assert project.name == "Test Project"
         assert project.description == "A test"
 
-    def test_project_create_minimal(self):
+    def test_project_create_minimal(self) -> None:
         """Test ProjectCreate with minimal fields."""
         project = ProjectCreate(name="Test")
         assert project.name == "Test"
         assert project.description is None
 
-    def test_project_update(self):
+    def test_project_update(self) -> None:
         """Test ProjectUpdate model."""
         update = ProjectUpdate(name="Updated Name")
         assert update.name == "Updated Name"
         assert update.configuration is None
 
-    def test_project_model(self):
+    def test_project_model(self) -> None:
         """Test Project model."""
         project = Project(
             id=UUID("12345678-1234-1234-1234-123456789012"),
@@ -86,14 +86,14 @@ class TestProjectModels:
 class TestActionModels:
     """Tests for action and workflow models."""
 
-    def test_action_type_enum(self):
+    def test_action_type_enum(self) -> None:
         """Test ActionType enum values."""
         assert ActionType.CLICK.value == "click"
         assert ActionType.TYPE.value == "type"
         assert ActionType.FIND.value == "find"
         assert ActionType.WAIT_FOR.value == "wait_for"
 
-    def test_action_config(self):
+    def test_action_config(self) -> None:
         """Test ActionConfig model."""
         config = ActionConfig(
             type=ActionType.CLICK,
@@ -103,7 +103,7 @@ class TestActionModels:
         assert config.type == ActionType.CLICK
         assert config.options["threshold"] == 0.9
 
-    def test_workflow_step(self):
+    def test_workflow_step(self) -> None:
         """Test WorkflowStep model."""
         step = WorkflowStep(
             id="step-1",
@@ -114,13 +114,13 @@ class TestActionModels:
         assert step.id == "step-1"
         assert step.type == ActionType.CLICK
 
-    def test_connection_target(self):
+    def test_connection_target(self) -> None:
         """Test ConnectionTarget model."""
         target = ConnectionTarget(action="step-2", type="main", index=0)
         assert target.action == "step-2"
         assert target.type == "main"
 
-    def test_workflow_definition(self):
+    def test_workflow_definition(self) -> None:
         """Test WorkflowDefinition model."""
         workflow = WorkflowDefinition(
             id="wf-1",
@@ -140,7 +140,7 @@ class TestActionModels:
 class TestStateModels:
     """Tests for state and transition models."""
 
-    def test_image_definition(self):
+    def test_image_definition(self) -> None:
         """Test ImageDefinition model."""
         image = ImageDefinition(
             id="img-1",
@@ -151,7 +151,7 @@ class TestStateModels:
         assert image.id == "img-1"
         assert image.format == "png"
 
-    def test_state_definition(self):
+    def test_state_definition(self) -> None:
         """Test StateDefinition model."""
         state = StateDefinition(
             id="state-1",
@@ -162,7 +162,7 @@ class TestStateModels:
         assert state.isInitial is True
         assert state.isFinal is False
 
-    def test_transition_definition(self):
+    def test_transition_definition(self) -> None:
         """Test TransitionDefinition model."""
         transition = TransitionDefinition(
             id="trans-1",
@@ -179,7 +179,7 @@ class TestStateModels:
 class TestExportConfiguration:
     """Tests for export configuration model."""
 
-    def test_export_configuration_empty(self):
+    def test_export_configuration_empty(self) -> None:
         """Test empty ExportConfiguration."""
         config = ExportConfiguration()
         assert config.version == "1.0.0"
@@ -187,7 +187,7 @@ class TestExportConfiguration:
         assert config.states == []
         assert config.images == []
 
-    def test_export_configuration_full(self):
+    def test_export_configuration_full(self) -> None:
         """Test full ExportConfiguration."""
         config = ExportConfiguration(
             version="2.0.0",
@@ -210,7 +210,7 @@ class TestExportConfiguration:
         assert len(config.states) == 1
         assert len(config.transitions) == 1
 
-    def test_export_configuration_serialization(self):
+    def test_export_configuration_serialization(self) -> None:
         """Test ExportConfiguration can be serialized."""
         config = ExportConfiguration(
             metadata={"name": "Test"},

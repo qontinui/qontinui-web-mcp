@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from qontinui_web_mcp.client import QontinuiClient
 from qontinui_web_mcp.tools.auth import AUTH_TOOLS, handle_auth_tool
 from qontinui_web_mcp.tools.capture import CAPTURE_TOOLS, handle_capture_tool
 from qontinui_web_mcp.tools.configuration import (
@@ -17,12 +18,13 @@ from qontinui_web_mcp.tools.transitions import (
     handle_transitions_tool,
 )
 from qontinui_web_mcp.tools.variables import VARIABLES_TOOLS, handle_variables_tool
+from qontinui_web_mcp.types import Project, User
 
 
 class TestToolDefinitions:
     """Tests for tool definitions."""
 
-    def test_auth_tools_defined(self):
+    def test_auth_tools_defined(self) -> None:
         """Test auth tools are properly defined."""
         assert len(AUTH_TOOLS) == 3
         tool_names = {t.name for t in AUTH_TOOLS}
@@ -30,7 +32,7 @@ class TestToolDefinitions:
         assert "auth_status" in tool_names
         assert "auth_logout" in tool_names
 
-    def test_projects_tools_defined(self):
+    def test_projects_tools_defined(self) -> None:
         """Test projects tools are properly defined."""
         assert len(PROJECTS_TOOLS) == 5
         tool_names = {t.name for t in PROJECTS_TOOLS}
@@ -40,7 +42,7 @@ class TestToolDefinitions:
         assert "update_project" in tool_names
         assert "delete_project" in tool_names
 
-    def test_configuration_tools_defined(self):
+    def test_configuration_tools_defined(self) -> None:
         """Test configuration tools are properly defined."""
         tool_names = {t.name for t in CONFIGURATION_TOOLS}
         assert "export_configuration" in tool_names
@@ -52,7 +54,7 @@ class TestToolDefinitions:
         assert "list_images" in tool_names
         assert "add_image" in tool_names
 
-    def test_execution_tools_defined(self):
+    def test_execution_tools_defined(self) -> None:
         """Test execution tools are properly defined."""
         assert len(EXECUTION_TOOLS) == 3
         tool_names = {t.name for t in EXECUTION_TOOLS}
@@ -60,7 +62,7 @@ class TestToolDefinitions:
         assert "get_execution_status" in tool_names
         assert "cancel_execution" in tool_names
 
-    def test_capture_tools_defined(self):
+    def test_capture_tools_defined(self) -> None:
         """Test capture tools are properly defined."""
         tool_names = {t.name for t in CAPTURE_TOOLS}
         assert "create_capture_session" in tool_names
@@ -69,7 +71,7 @@ class TestToolDefinitions:
         assert "add_capture_action" in tool_names
         assert "complete_capture_session" in tool_names
 
-    def test_variables_tools_defined(self):
+    def test_variables_tools_defined(self) -> None:
         """Test variables tools are properly defined."""
         tool_names = {t.name for t in VARIABLES_TOOLS}
         assert "list_variables" in tool_names
@@ -77,7 +79,7 @@ class TestToolDefinitions:
         assert "update_variable" in tool_names
         assert "delete_variable" in tool_names
 
-    def test_transitions_tools_defined(self):
+    def test_transitions_tools_defined(self) -> None:
         """Test transitions tools are properly defined."""
         tool_names = {t.name for t in TRANSITIONS_TOOLS}
         assert "list_transitions" in tool_names
@@ -85,7 +87,7 @@ class TestToolDefinitions:
         assert "update_transition" in tool_names
         assert "delete_transition" in tool_names
 
-    def test_all_tools_have_schemas(self):
+    def test_all_tools_have_schemas(self) -> None:
         """Test all tools have input schemas."""
         all_tools = (
             AUTH_TOOLS
@@ -106,7 +108,9 @@ class TestAuthTools:
     """Tests for authentication tools."""
 
     @pytest.mark.asyncio
-    async def test_auth_login_success(self, mock_client, mock_user):
+    async def test_auth_login_success(
+        self, mock_client: QontinuiClient, mock_user: User
+    ) -> None:
         """Test successful login."""
         mock_client._access_token = None  # Start unauthenticated
 
@@ -123,7 +127,9 @@ class TestAuthTools:
         assert "user" in result
 
     @pytest.mark.asyncio
-    async def test_auth_login_missing_credentials(self, mock_client):
+    async def test_auth_login_missing_credentials(
+        self, mock_client: QontinuiClient
+    ) -> None:
         """Test login with missing credentials."""
         result = await handle_auth_tool(
             "auth_login",
@@ -134,7 +140,9 @@ class TestAuthTools:
         assert "required" in result["error"].lower()
 
     @pytest.mark.asyncio
-    async def test_auth_status_authenticated(self, mock_client, mock_user):
+    async def test_auth_status_authenticated(
+        self, mock_client: QontinuiClient, mock_user: User
+    ) -> None:
         """Test auth status when authenticated."""
         with patch.object(mock_client, "get_current_user", return_value=mock_user):
             result = await handle_auth_tool("auth_status", {}, mock_client)
@@ -143,13 +151,15 @@ class TestAuthTools:
         assert result["user"]["email"] == mock_user.email
 
     @pytest.mark.asyncio
-    async def test_auth_status_unauthenticated(self, unauthenticated_client):
+    async def test_auth_status_unauthenticated(
+        self, unauthenticated_client: QontinuiClient
+    ) -> None:
         """Test auth status when not authenticated."""
         result = await handle_auth_tool("auth_status", {}, unauthenticated_client)
         assert result["authenticated"] is False
 
     @pytest.mark.asyncio
-    async def test_auth_logout(self, mock_client):
+    async def test_auth_logout(self, mock_client: QontinuiClient) -> None:
         """Test logout."""
         result = await handle_auth_tool("auth_logout", {}, mock_client)
         assert result["success"] is True
@@ -160,7 +170,9 @@ class TestProjectsTools:
     """Tests for project tools."""
 
     @pytest.mark.asyncio
-    async def test_list_projects(self, mock_client, mock_project):
+    async def test_list_projects(
+        self, mock_client: QontinuiClient, mock_project: Project
+    ) -> None:
         """Test listing projects."""
         with patch.object(mock_client, "list_projects", return_value=[mock_project]):
             result = await handle_projects_tool("list_projects", {}, mock_client)
@@ -170,7 +182,9 @@ class TestProjectsTools:
         assert result["projects"][0]["name"] == "Test Project"
 
     @pytest.mark.asyncio
-    async def test_create_project(self, mock_client, mock_project):
+    async def test_create_project(
+        self, mock_client: QontinuiClient, mock_project: Project
+    ) -> None:
         """Test creating a project."""
         with patch.object(mock_client, "create_project", return_value=mock_project):
             result = await handle_projects_tool(
@@ -183,14 +197,18 @@ class TestProjectsTools:
         assert result["project"]["name"] == "Test Project"
 
     @pytest.mark.asyncio
-    async def test_create_project_missing_name(self, mock_client):
+    async def test_create_project_missing_name(
+        self, mock_client: QontinuiClient
+    ) -> None:
         """Test creating a project without name."""
         result = await handle_projects_tool("create_project", {}, mock_client)
         assert result["success"] is False
         assert "name" in result["error"].lower()
 
     @pytest.mark.asyncio
-    async def test_get_project(self, mock_client, mock_project):
+    async def test_get_project(
+        self, mock_client: QontinuiClient, mock_project: Project
+    ) -> None:
         """Test getting a project."""
         with patch.object(mock_client, "get_project", return_value=mock_project):
             result = await handle_projects_tool(
@@ -203,7 +221,9 @@ class TestProjectsTools:
         assert result["project"]["name"] == "Test Project"
 
     @pytest.mark.asyncio
-    async def test_delete_project(self, mock_client, mock_project):
+    async def test_delete_project(
+        self, mock_client: QontinuiClient, mock_project: Project
+    ) -> None:
         """Test deleting a project."""
         with patch.object(mock_client, "delete_project") as mock_delete:
             result = await handle_projects_tool(
@@ -220,7 +240,9 @@ class TestConfigurationTools:
     """Tests for configuration tools."""
 
     @pytest.mark.asyncio
-    async def test_list_workflows(self, mock_client, mock_project):
+    async def test_list_workflows(
+        self, mock_client: QontinuiClient, mock_project: Project
+    ) -> None:
         """Test listing workflows."""
         project_with_workflows = mock_project.model_copy()
         project_with_workflows.configuration = {
@@ -244,7 +266,9 @@ class TestConfigurationTools:
         assert result["count"] == 1
 
     @pytest.mark.asyncio
-    async def test_create_workflow(self, mock_client, mock_project):
+    async def test_create_workflow(
+        self, mock_client: QontinuiClient, mock_project: Project
+    ) -> None:
         """Test creating a workflow."""
         with patch.object(mock_client, "add_workflow", return_value=mock_project):
             result = await handle_configuration_tool(
@@ -260,7 +284,9 @@ class TestConfigurationTools:
         assert result["workflow"]["name"] == "New Workflow"
 
     @pytest.mark.asyncio
-    async def test_list_states(self, mock_client, mock_project):
+    async def test_list_states(
+        self, mock_client: QontinuiClient, mock_project: Project
+    ) -> None:
         """Test listing states."""
         with patch.object(
             mock_client,
@@ -277,7 +303,9 @@ class TestConfigurationTools:
         assert result["count"] == 1
 
     @pytest.mark.asyncio
-    async def test_create_state(self, mock_client, mock_project):
+    async def test_create_state(
+        self, mock_client: QontinuiClient, mock_project: Project
+    ) -> None:
         """Test creating a state."""
         with patch.object(mock_client, "add_state", return_value=mock_project):
             result = await handle_configuration_tool(
@@ -297,7 +325,9 @@ class TestTransitionsTools:
     """Tests for transition tools."""
 
     @pytest.mark.asyncio
-    async def test_list_transitions(self, mock_client, mock_project):
+    async def test_list_transitions(
+        self, mock_client: QontinuiClient, mock_project: Project
+    ) -> None:
         """Test listing transitions."""
         project_with_transitions = mock_project.model_copy()
         project_with_transitions.configuration = {
@@ -326,7 +356,9 @@ class TestTransitionsTools:
         assert result["count"] == 1
 
     @pytest.mark.asyncio
-    async def test_create_transition(self, mock_client, mock_project):
+    async def test_create_transition(
+        self, mock_client: QontinuiClient, mock_project: Project
+    ) -> None:
         """Test creating a transition."""
         with patch.object(mock_client, "get_project", return_value=mock_project):
             with patch.object(mock_client, "update_project", return_value=mock_project):
@@ -349,7 +381,9 @@ class TestVariablesTools:
     """Tests for variable tools."""
 
     @pytest.mark.asyncio
-    async def test_create_variable(self, mock_client, mock_project):
+    async def test_create_variable(
+        self, mock_client: QontinuiClient, mock_project: Project
+    ) -> None:
         """Test creating a variable."""
         with patch.object(
             mock_client,
@@ -376,8 +410,8 @@ class TestVariablesTools:
 
     @pytest.mark.asyncio
     async def test_create_workflow_scoped_variable_missing_workflow_id(
-        self, mock_client, mock_project
-    ):
+        self, mock_client: QontinuiClient, mock_project: Project
+    ) -> None:
         """Test creating workflow-scoped variable without workflow_id."""
         result = await handle_variables_tool(
             "create_variable",
@@ -398,7 +432,9 @@ class TestCaptureTools:
     """Tests for capture tools."""
 
     @pytest.mark.asyncio
-    async def test_create_capture_session(self, mock_client, mock_project):
+    async def test_create_capture_session(
+        self, mock_client: QontinuiClient, mock_project: Project
+    ) -> None:
         """Test creating a capture session."""
         with patch.object(
             mock_client,
@@ -426,7 +462,9 @@ class TestExecutionTools:
     """Tests for execution tools."""
 
     @pytest.mark.asyncio
-    async def test_execute_workflow(self, mock_client, mock_project):
+    async def test_execute_workflow(
+        self, mock_client: QontinuiClient, mock_project: Project
+    ) -> None:
         """Test executing a workflow."""
         with patch.object(
             mock_client,
@@ -446,7 +484,9 @@ class TestExecutionTools:
         assert "session" in result
 
     @pytest.mark.asyncio
-    async def test_execute_workflow_missing_params(self, mock_client):
+    async def test_execute_workflow_missing_params(
+        self, mock_client: QontinuiClient
+    ) -> None:
         """Test executing workflow with missing parameters."""
         result = await handle_execution_tool(
             "execute_workflow",

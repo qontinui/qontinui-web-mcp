@@ -1,7 +1,7 @@
 """HTTP client for Qontinui web backend API."""
 
 import logging
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 import httpx
@@ -166,7 +166,8 @@ class QontinuiClient:
             if response.status_code == 204 or not response.content:
                 return {}
 
-            return response.json()
+            result: dict[str, Any] = response.json()
+            return result
 
         except httpx.RequestError as e:
             logger.error(f"Request failed: {e}")
@@ -250,7 +251,9 @@ class QontinuiClient:
         if organization_id:
             params["organization_id"] = str(organization_id)
 
-        data = await self._request("GET", "/api/v1/projects", params=params)
+        response = await self._request("GET", "/api/v1/projects", params=params)
+        # The API returns a list of projects, cast for type safety
+        data = cast(list[dict[str, Any]], response)
         return [Project(**p) for p in data]
 
     async def create_project(self, project: ProjectCreate) -> Project:
@@ -379,7 +382,8 @@ class QontinuiClient:
             List of workflow definitions
         """
         project = await self.get_project(project_id)
-        return project.configuration.get("workflows", [])
+        workflows: list[dict[str, Any]] = project.configuration.get("workflows", [])
+        return workflows
 
     async def add_workflow(self, project_id: UUID, workflow: dict[str, Any]) -> Project:
         """Add a workflow to a project.
@@ -463,7 +467,8 @@ class QontinuiClient:
             List of state definitions
         """
         project = await self.get_project(project_id)
-        return project.configuration.get("states", [])
+        states: list[dict[str, Any]] = project.configuration.get("states", [])
+        return states
 
     async def add_state(self, project_id: UUID, state: dict[str, Any]) -> Project:
         """Add a state to a project.
@@ -547,7 +552,8 @@ class QontinuiClient:
             List of image definitions
         """
         project = await self.get_project(project_id)
-        return project.configuration.get("images", [])
+        images: list[dict[str, Any]] = project.configuration.get("images", [])
+        return images
 
     async def add_image(self, project_id: UUID, image: dict[str, Any]) -> Project:
         """Add an image to a project.

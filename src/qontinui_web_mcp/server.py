@@ -76,7 +76,7 @@ AUTHENTICATED_TOOL_NAMES = (
 )
 
 
-@server.list_tools()
+@server.list_tools()  # type: ignore[no-untyped-call, untyped-decorator]
 async def list_tools() -> list[Tool]:
     """List all available tools."""
     return (
@@ -122,7 +122,7 @@ async def ensure_authenticated(client: QontinuiClient) -> dict[str, Any] | None:
         }
 
 
-@server.call_tool()
+@server.call_tool()  # type: ignore[untyped-decorator]
 async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
     """Handle tool calls.
 
