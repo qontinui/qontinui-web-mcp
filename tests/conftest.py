@@ -1,7 +1,6 @@
 """Pytest fixtures for qontinui-web-mcp tests."""
 
 from datetime import datetime
-from typing import Generator
 from uuid import UUID
 
 import pytest
