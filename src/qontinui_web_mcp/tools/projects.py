@@ -108,7 +108,7 @@ PROJECTS_TOOLS = [
     Tool(
         name="delete_project",
         description=(
-            "Delete a project and all its contents. " "This action is irreversible."
+            "Delete a project and all its contents. This action is irreversible."
         ),
         inputSchema={
             "type": "object",
