@@ -177,6 +177,6 @@ class TestToolCategories:
         }
 
         for tool_name in expected_auth_requiring:
-            assert (
-                tool_name in AUTHENTICATED_TOOL_NAMES
-            ), f"{tool_name} should require auth"
+            assert tool_name in AUTHENTICATED_TOOL_NAMES, (
+                f"{tool_name} should require auth"
+            )
